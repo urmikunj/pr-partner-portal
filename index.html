@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PR Tax Associates — Partner Review Portal</title>
+<style>
+  :root {
+    --navy: #1F4E79;
+    --navy-light: #2E75B6;
+    --navy-pale: #E6F1FB;
+    --green: #1D9E75;
+    --green-pale: #E1F5EE;
+    --amber: #BA7517;
+    --amber-pale: #FAEEDA;
+    --red: #A32D2D;
+    --red-pale: #FCEBEB;
+    --gray-50: #F8F9FA;
+    --gray-100: #F1F3F5;
+    --gray-200: #E9ECEF;
+    --gray-300: #DEE2E6;
+    --gray-400: #CED4DA;
+    --gray-500: #ADB5BD;
+    --gray-600: #6C757D;
+    --gray-700: #495057;
+    --gray-800: #343A40;
+    --gray-900: #212529;
+    --white: #FFFFFF;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.6; }
+  a { color: var(--navy-light); text-decoration: none; }
+
+  /* ── LOGIN ── */
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 100%); padding: 1rem; }
+  .login-box { background: var(--white); border-radius: var(--radius-lg); padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: var(--shadow-md); }
+  .login-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; }
+  .logo-mark { width: 40px; height: 40px; background: var(--navy); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+  .logo-mark span { color: white; font-size: 16px; font-weight: 700; }
+  .logo-text { font-size: 14px; font-weight: 600; color: var(--gray-800); line-height: 1.3; }
+  .logo-text small { display: block; font-size: 12px; font-weight: 400; color: var(--gray-500); }
+  .login-heading { font-size: 22px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+  .login-desc { font-size: 14px; color: var(--gray-600); margin-bottom: 1.75rem; line-height: 1.5; }
+  .field { margin-bottom: 1.1rem; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+  .field select, .field input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); font-size: 14px; color: var(--gray-900); background: var(--white); transition: border-color 0.15s; }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--navy-light); }
+  .login-err { font-size: 13px; color: var(--red); background: var(--red-pale); padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 1rem; display: none; }
+  .login-err.show { display: block; }
+  .btn-login { width: 100%; padding: 12px; background: var(--navy); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-login:hover { background: #185096; }
+  .login-hint { margin-top: 1.25rem; padding: 12px 14px; background: var(--gray-50); border-radius: var(--radius-sm); border: 1px solid var(--gray-200); }
+  .login-hint p { font-size: 12px; color: var(--gray-600); }
+  .login-hint strong { color: var(--gray-800); }
+
+  /* ── APP SHELL ── */
+  #app-screen { display: none; min-height: 100vh; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-logo { width: 32px; height: 32px; background: var(--navy); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .topbar-logo span { color: white; font-size: 13px; font-weight: 700; }
+  .topbar-name { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .topbar-sub { font-size: 12px; color: var(--gray-500); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .user-badge { display: flex; align-items: center; gap: 8px; background: var(--navy-pale); padding: 6px 12px; border-radius: 20px; }
+  .user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: white; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .user-badge span { font-size: 13px; font-weight: 500; color: var(--navy); }
+  .btn-logout { font-size: 13px; color: var(--gray-600); background: none; border: 1px solid var(--gray-300); padding: 5px 12px; border-radius: var(--radius-sm); cursor: pointer; }
+  .btn-logout:hover { background: var(--gray-100); }
+
+  /* ── NAV TABS ── */
+  .doc-nav { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 0 1.5rem; display: flex; gap: 0; overflow-x: auto; }
+  .doc-nav-btn { padding: 14px 20px; font-size: 14px; font-weight: 500; color: var(--gray-500); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .doc-nav-btn:hover { color: var(--gray-800); }
+  .doc-nav-btn.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+  /* ── PROGRESS STRIP ── */
+  .progress-strip { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 10px 1.5rem; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .progress-info { font-size: 13px; color: var(--gray-600); }
+  .progress-bar-outer { flex: 1; min-width: 120px; max-width: 200px; height: 6px; background: var(--gray-200); border-radius: 3px; overflow: hidden; }
+  .progress-bar-inner { height: 100%; background: var(--navy); border-radius: 3px; transition: width 0.4s; }
+  .partner-stat { display: flex; align-items: center; gap: 6px; }
+  .p-badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .p-badge.none { background: var(--gray-100); color: var(--gray-500); border: 1px solid var(--gray-200); }
+  .p-badge.partial { background: var(--amber-pale); color: var(--amber); border: 1px solid #EF9F27; }
+  .p-badge.complete { background: var(--green-pale); color: var(--green); border: 1px solid #5DCAA5; }
+
+  /* ── MAIN CONTENT ── */
+  .main-content { max-width: 900px; margin: 0 auto; padding: 1.75rem 1.5rem; }
+
+  /* ── SECTION CARDS ── */
+  .section-card { background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--gray-200); margin-bottom: 1rem; box-shadow: var(--shadow-sm); overflow: hidden; transition: box-shadow 0.15s; }
+  .section-card:hover { box-shadow: var(--shadow-md); }
+  .section-header { padding: 1.1rem 1.25rem; cursor: pointer; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .section-header:hover { background: var(--gray-50); }
+  .section-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .section-tag { font-size: 11px; font-weight: 600; color: var(--navy); background: var(--navy-pale); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.03em; }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .section-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .response-dots { display: flex; gap: 5px; align-items: center; }
+  .r-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--gray-300); background: var(--white); flex-shrink: 0; }
+  .r-dot.agreed { background: var(--green); border-color: var(--green); }
+  .r-dot.discuss { background: #EF9F27; border-color: #EF9F27; }
+  .r-dot.objection { background: #E24B4A; border-color: #E24B4A; }
+  .expand-icon { font-size: 16px; color: var(--gray-400); transition: transform 0.2s; user-select: none; }
+  .expand-icon.open { transform: rotate(180deg); }
+
+  /* ── SECTION BODY ── */
+  .section-body { display: none; border-top: 1px solid var(--gray-100); }
+  .section-body.open { display: block; }
+
+  /* ── DOC CONTENT ── */
+  .doc-text { padding: 1.25rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-100); }
+  .doc-text-inner { font-size: 14px; color: var(--gray-700); line-height: 1.75; }
+  .doc-text-inner p { margin-bottom: 0.75rem; }
+  .doc-text-inner p:last-child { margin-bottom: 0; }
+  .doc-text-inner ul { padding-left: 1.4rem; margin-bottom: 0.75rem; }
+  .doc-text-inner li { margin-bottom: 0.4rem; }
+  .doc-text-inner strong { color: var(--gray-900); font-weight: 600; }
+  .doc-text-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); margin-bottom: 10px; }
+
+  /* ── FEEDBACK PANEL ── */
+  .feedback-panel { padding: 1.25rem; }
+  .feedback-panel-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); margin-bottom: 1rem; }
+  .all-responses { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  .response-card { border-radius: var(--radius-sm); border: 1px solid var(--gray-200); padding: 12px 14px; background: var(--white); }
+  .response-card.agreed { border-left: 3px solid var(--green); }
+  .response-card.discuss { border-left: 3px solid #EF9F27; }
+  .response-card.objection { border-left: 3px solid #E24B4A; }
+  .response-card.pending { border-left: 3px solid var(--gray-300); background: var(--gray-50); }
+  .rc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .rc-name { font-size: 13px; font-weight: 600; color: var(--gray-900); }
+  .rc-status { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+  .rc-status.agreed { background: var(--green-pale); color: var(--green); }
+  .rc-status.discuss { background: var(--amber-pale); color: var(--amber); }
+  .rc-status.objection { background: var(--red-pale); color: var(--red); }
+  .rc-status.pending { background: var(--gray-100); color: var(--gray-500); }
+  .rc-comment { font-size: 13px; color: var(--gray-600); line-height: 1.5; font-style: italic; }
+  .rc-time { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+  /* ── MY RESPONSE FORM ── */
+  .my-response-box { background: var(--navy-pale); border-radius: var(--radius-sm); padding: 1rem 1.1rem; border: 1px solid #B5D4F4; }
+  .my-response-label { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 10px; }
+  .status-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .s-btn { font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--gray-300); background: var(--white); color: var(--gray-600); cursor: pointer; transition: all 0.15s; }
+  .s-btn:hover { border-color: var(--gray-500); color: var(--gray-900); }
+  .s-btn.active-agreed { background: var(--green-pale); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .s-btn.active-discuss { background: var(--amber-pale); border-color: #EF9F27; color: var(--amber); font-weight: 600; }
+  .s-btn.active-objection { background: var(--red-pale); border-color: #E24B4A; color: var(--red); font-weight: 600; }
+  .comment-area { width: 100%; padding: 10px 12px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); font-size: 13px; color: var(--gray-900); resize: vertical; min-height: 70px; font-family: inherit; line-height: 1.5; background: var(--white); transition: border-color 0.15s; }
+  .comment-area:focus { outline: none; border-color: var(--navy-light); }
+  .form-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .save-btn { padding: 8px 20px; background: var(--navy); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .save-btn:hover { background: #185096; }
+  .save-btn:disabled { background: var(--gray-300); cursor: not-allowed; }
+  .save-msg { font-size: 12px; color: var(--green); font-weight: 500; display: none; }
+  .save-msg.show { display: block; }
+
+  /* ── SUMMARY VIEW ── */
+  .summary-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+  .sm-card { background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--gray-200); padding: 1.1rem 1.25rem; box-shadow: var(--shadow-sm); }
+  .sm-label { font-size: 12px; color: var(--gray-500); margin-bottom: 6px; }
+  .sm-value { font-size: 26px; font-weight: 700; color: var(--gray-900); }
+  .sm-value.green { color: var(--green); }
+  .sm-value.amber { color: var(--amber); }
+  .sm-value.red { color: var(--red); }
+  .sm-sub { font-size: 12px; color: var(--gray-400); margin-top: 3px; }
+  .summary-group { margin-bottom: 2rem; }
+  .sg-heading { font-size: 14px; font-weight: 700; padding: 8px 14px; border-radius: var(--radius-sm); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .sg-heading.objection { background: var(--red-pale); color: var(--red); }
+  .sg-heading.discuss { background: var(--amber-pale); color: var(--amber); }
+  .sg-heading.agreed { background: var(--green-pale); color: var(--green); }
+  .sg-heading.pending { background: var(--gray-100); color: var(--gray-600); }
+  .sg-count { font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.6); }
+  .summary-row { background: var(--white); border-radius: var(--radius-sm); border: 1px solid var(--gray-200); padding: 12px 16px; margin-bottom: 8px; }
+  .sr-doc { font-size: 11px; color: var(--gray-400); margin-bottom: 3px; }
+  .sr-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 8px; }
+  .sr-responses { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .sr-pill { font-size: 12px; padding: 3px 10px; border-radius: 20px; }
+  .sr-pill.agreed { background: var(--green-pale); color: var(--green); }
+  .sr-pill.discuss { background: var(--amber-pale); color: var(--amber); }
+  .sr-pill.objection { background: var(--red-pale); color: var(--red); }
+  .sr-pill.pending { background: var(--gray-100); color: var(--gray-500); }
+  .sr-comments { margin-top: 6px; }
+  .sr-comment-line { font-size: 13px; color: var(--gray-600); padding: 4px 0; border-top: 1px solid var(--gray-100); }
+  .empty-state { padding: 12px 16px; background: var(--gray-50); border-radius: var(--radius-sm); font-size: 13px; color: var(--gray-400); font-style: italic; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .topbar-sub { display: none; }
+    .main-content { padding: 1rem; }
+    .progress-bar-outer { display: none; }
+    .all-responses { grid-template-columns: 1fr; }
+  }
+
+  .doc-separator { font-size: 13px; font-weight: 600; color: var(--gray-500); padding: 0.5rem 0 0.75rem; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 10px; }
+  .doc-separator::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-mark"><span>PR</span></div>
+      <div class="logo-text">PR Tax Associates Inc.<small>Partner review portal</small></div>
+    </div>
+    <div class="login-heading">Welcome, partner</div>
+    <div class="login-desc">Review both governance documents, record your position on each section, and leave comments. All three partners see responses in real time.</div>
+    <div class="field">
+      <label for="sel-name">Your name</label>
+      <select id="sel-name">
+        <option value="">Select your name...</option>
+        <option value="Nital">Nital</option>
+        <option value="Pratik">Pratik</option>
+        <option value="Hardik">Hardik</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="inp-code">Access code</label>
+      <input type="password" id="inp-code" placeholder="Enter access code" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-err" id="login-err">Incorrect name or access code. Please try again.</div>
+    <button class="btn-login" onclick="doLogin()">Enter portal</button>
+
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo"><span>PR</span></div>
+      <div>
+        <div class="topbar-name">PR Tax Associates Inc.</div>
+        <div class="topbar-sub">Partner review portal</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-badge">
+        <div class="user-avatar" id="user-av">N</div>
+        <span id="user-name-display">Nital</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="doc-nav">
+    <button class="doc-nav-btn active" onclick="switchView('gov',this)">Governance framework</button>
+    <button class="doc-nav-btn" onclick="switchView('life',this)">Life events article</button>
+    <button class="doc-nav-btn" onclick="switchView('summary',this)">Agreement summary</button>
+  </div>
+
+  <div class="progress-strip" id="progress-strip">
+    <span class="progress-info" id="prog-info">Loading...</span>
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar" style="width:0%"></div></div>
+    <div class="partner-stat" id="partner-stat"></div>
+  </div>
+
+  <div class="main-content" id="main-content"></div>
+</div>
+
+<script>
+const PASS = '1305@Wiley';
+let currentUser = null;
+let currentView = 'gov';
+const selectedStatus = {};
+
+const DOCS = {
+  gov: {
+    label: 'Governance Framework',
+    sections: [
+      { id:'g1', tag:'Section 1', title:'Entity structure overview',
+        body:`<p><strong>Three-entity structure:</strong> PR Tax Associates Inc. (S-Corp) sits above three single-member LLCs. All client revenue flows into the S-Corp. Profit distributes to each partner LLC under the three-component compensation model.</p>
+<p><strong>Entity map:</strong> PR Tax Associates Inc. (S-Corp, 33.33% each) — Nital LLC, Pratik LLC, Hardik LLC. Each LLC is 100% owned by the respective partner in their individual capacity.</p>
+<p><strong>Illinois formation requirements per LLC:</strong> File Articles of Organization ($150 fee), obtain a separate EIN from the IRS, open a dedicated business bank account, and file an annual Illinois report ($75/year). Each LLC is a disregarded entity for federal tax purposes, passing through to the partner's personal Form 1040.</p>` },
+      { id:'g2', tag:'Section 2', title:'S-Corp governance and tax obligations',
+        body:`<p>PR Tax Associates Inc. is the sole operating entity. All engagement letters, client payments, staff payroll, and offshore vendor invoices flow through the S-Corp. Partners hold shares as individuals — not through their LLCs — as required by IRS S-Corp eligibility rules.</p>
+<p><strong>Annual tax obligations include:</strong> Federal Form 1120-S (due March 15), Illinois IL-1120-ST, Illinois Personal Property Replacement Tax (1.5% of net income), quarterly Form 941, annual Form 940, and quarterly Illinois UI-3/40 unemployment filing.</p>` },
+      { id:'g3', tag:'Section 3A', title:'Base draw — equal with conditions',
+        body:`<p>Each partner receives an equal base draw of <strong>33.33% of net profit</strong> — the same rate as today. To receive the full draw each quarter, all three conditions must be met:</p>
+<ul>
+<li><strong>Condition 1 — Attendance:</strong> 100% monthly meeting attendance (one excused absence per quarter with 48-hr notice allowed). Written goals submitted by January 31. 90%+ prior-meeting action items closed.</li>
+<li><strong>Condition 2 — Performance floor (60% minimum):</strong> Quarterly score across four metrics: client retention rate (30%), timely delivery (30%), engagement letter compliance (20%), cross-sell revenue on existing clients (20%).</li>
+<li><strong>Condition 3 — Service delivery:</strong> Zero unresolved client complaints at quarter end. 100% engagement letters including scope addendums on file.</li>
+</ul>
+<p><strong>Draw reduction schedule:</strong> 1 condition missed = 15% reduction. 2 missed = 30%. All 3 missed = 50%. A 30-day written cure period applies. Two consecutive quarters below threshold triggers the performance-based removal process.</p>` },
+      { id:'g4', tag:'Section 3B', title:'Origination credits — all three partners',
+        body:`<p>All three partners are eligible for origination credits, paid quarterly on top of base draw. Nital and Pratik earn full origination credits for clients they source. Hardik earns a reduced service retention credit on clients assigned to him.</p>
+<ul>
+<li><strong>Nital and Pratik:</strong> 15% of first-year fees on clients they source. 10% retention credit in years 2 and 3. No credit from year 4 onward.</li>
+<li><strong>Hardik:</strong> 5% of year 1 fees on assigned clients retained with zero complaints. 3% in years 2 and 3. Credit is forfeited if the client is lost or has an unresolved complaint.</li>
+</ul>
+<p>Shruthi tracks all credits separately and submits a monthly report to all three partners by the 5th of each month.</p>` },
+      { id:'g5', tag:'Section 3C', title:'Performance pool — all three partners',
+        body:`<p>Remaining net profit after base draws and origination credits flows into a performance pool, distributed proportionally to each partner's quarterly score.</p>
+<ul>
+<li>Client retention on assigned portfolio: <strong>30% weight</strong></li>
+<li>Timely delivery and client satisfaction: <strong>30% weight</strong></li>
+<li>Engagement letter compliance: <strong>20% weight</strong></li>
+<li>New service revenue on existing clients: <strong>20% weight</strong></li>
+</ul>
+<p>Year-end distribution is based on the average of four quarterly scores. Scores are calculated by Shruthi and reviewed at each monthly partner meeting.</p>` },
+      { id:'g6', tag:'Section 4', title:'24-month phase-in schedule',
+        body:`<p>The transition from equal draws to the full three-component model phases in over 24 months to allow all partners to adjust without sudden income changes.</p>
+<ul>
+<li><strong>Months 1–6:</strong> Equal 33.33% draw. No origination credits or performance pool active.</li>
+<li><strong>Months 7–12:</strong> Conditions begin. 25% of full credit rate. 10% of remaining pool.</li>
+<li><strong>Months 13–18:</strong> 60% of full credit rate. 30% of remaining pool.</li>
+<li><strong>Months 19–24:</strong> 80% of full credit rate. 70% of remaining pool.</li>
+<li><strong>Month 25 onward:</strong> Full model active at all credit rates.</li>
+</ul>
+<p>At each phase transition, the Managing Partner convenes a partner meeting to confirm the next phase activates.</p>` },
+      { id:'g7', tag:'Section 5', title:'Managing partner stipend',
+        body:`<p>The Managing Partner role is recommended for Nital. The stipend is paid monthly from S-Corp operating funds before the profit split and is treated as W-2 wages subject to payroll tax.</p>
+<ul>
+<li><strong>Annual stipend:</strong> $18,000–$24,000/year, set annually by partner vote</li>
+<li><strong>Payment timing:</strong> Monthly, before profit split</li>
+<li><strong>Review cycle:</strong> Annual at December partner meeting</li>
+<li><strong>Successor:</strong> Any partner may be nominated by majority vote</li>
+</ul>` },
+      { id:'g8', tag:'Section 6', title:'Distribution flow and tax treatment',
+        body:`<p><strong>Seven-step fund flow:</strong> Client pays S-Corp → S-Corp pays all expenses → S-Corp pays Managing Partner stipend (W-2) → Net profit calculated → Distributed to three partners per three-component model → Deposited into each partner LLC bank account → Partner draws personal income from their own LLC.</p>
+<p><strong>Important:</strong> S-Corp distributions are not subject to self-employment tax. However, each partner-shareholder performing services must receive reasonable W-2 compensation before distributions begin. Verify this with your legal advisor.</p>` },
+      { id:'g9', tag:'Section 7A', title:'Insurance — S-Corp obligations',
+        body:`<p>PR Tax Associates Inc. carries three firm-wide policies from S-Corp operating funds:</p>
+<ul>
+<li><strong>Cybersecurity and data breach insurance:</strong> Covers all client data firm-wide regardless of which partner manages the client.</li>
+<li><strong>Workers' compensation insurance:</strong> Required under Illinois law (820 ILCS 305) for all W-2 employees including Shruthi, Divyang, part-time staff, and partner spouses.</li>
+<li><strong>Commercial property and rental insurance:</strong> Covers firm office space, equipment and lease obligations.</li>
+</ul>
+<p>The S-Corp does not carry professional liability (E&O) insurance. Each partner LLC carries that independently.</p>` },
+      { id:'g10', tag:'Section 7B', title:'Insurance — partner LLC obligations and personal guarantee',
+        body:`<p><strong>Coverage minimums (Illinois CPA Society / AICPA industry standard):</strong></p>
+<ul>
+<li>Firm-wide floor: $1,000,000 per occurrence / $2,000,000 aggregate — mandatory minimum for all three LLCs regardless of portfolio size</li>
+<li>Portfolio-scaled minimum: 2× each partner LLC's prior year annual billed revenue, or the firm-wide floor, whichever is higher</li>
+<li>Recalculated annually by January 31 based on Shruthi's billing log</li>
+<li>Partner must upgrade coverage if portfolio growth triggers a higher minimum</li>
+</ul>
+<p><strong>Personal guarantee on coverage lapse:</strong> If coverage lapses and a claim arises during the lapse period, the partner's personal guarantee covers the claim up to the amount the policy would have covered. The guarantee is capped at that amount and released when coverage is reinstated. Partners must notify the Managing Partner within 48 hours of any lapse, cancellation, or non-renewal.</p>` },
+      { id:'g11', tag:'Section 7C', title:'Gross negligence and willful misrepresentation',
+        body:`<p><strong>Gross negligence:</strong> A conscious and voluntary disregard of a known risk likely to cause foreseeable harm. This is a higher standard than ordinary negligence and requires reckless conduct, not mere mistake.</p>
+<p><strong>Willful misrepresentation:</strong> A knowingly false statement of material fact made to a client with intent to induce reliance, resulting in harm to the client.</p>
+<p><strong>Liability assignment:</strong> The serving partner whose conduct personally gave rise to the claim bears sole responsibility. This applies only to acts personally committed or directly supervised by the serving partner. PR Tax Associates Inc. and the other two partner LLCs bear no obligation for that claim. If the claim exceeds the serving partner's policy limits, the excess is the partner's personal responsibility. A final finding may trigger performance-based removal.</p>` },
+      { id:'g12', tag:'Section 8', title:'Growth-limiting election',
+        body:`<p>A partner may formally elect Reduced-Participation status with 60 days written notice. This cannot be elected within the first 36 months and is irrevocable for a minimum of 24 months.</p>
+<p><strong>Retains:</strong> Ownership percentage, assigned client portfolio, share of net profit from assigned clients, right to return after 24 months.</p>
+<p><strong>Relinquishes:</strong> Voting rights on new business initiatives, origination credits on new clients brought in after the election date, share of performance pool from new growth clients, Managing Partner eligibility during the reduced period.</p>
+<p><strong>Buydown option:</strong> Remaining partners may purchase a portion of the reduced partner's ownership at FMV. The partner cannot be reduced below 15% ownership without written consent.</p>` },
+      { id:'g13', tag:'Section 9', title:'Partner exit provisions',
+        body:`<p><strong>Voluntary withdrawal:</strong> 12 months written notice required. Full client transition cooperation during notice period. 24-month non-solicitation of firm clients and staff after exit. FMV redemption paid in equal annual installments over 5 years. FMV is reduced proportionately if client departures result from the partner's failure to transition.</p>
+<p><strong>Performance-based removal:</strong> Requires vote of both non-affected partners. Triggered by two consecutive years missing written goals; repeated pricing or engagement letter violations after written notice; sustained disengagement without a formal reduced-participation election; or a final finding of gross negligence or willful misrepresentation. 60-day written cure period before removal is final. FMV at a 15% discount paid over 5 years. 24-month non-solicitation obligation applies.</p>` },
+      { id:'g14', tag:'Section 10', title:'Pricing standards and engagement letter compliance',
+        body:`<p><strong>Pricing floors — Pratik owns the pricing function. No partner quotes below the floor without Pratik's written approval.</strong></p>
+<ul>
+<li>Bookkeeping: Simple $1,800 min / Standard $2,200 min / Complex $2,800 min — all no cap</li>
+<li>Business tax (S-Corp, Partnership, C-Corp): $550 minimum each, no cap</li>
+<li>Personal tax: Simple $120 min / Complex $300 min — no cap</li>
+<li>Payroll: $2.50 per employee per paycheck minimum — no cap</li>
+<li>Sales tax standalone: $250/filing min. Bundled with other services: $120/filing min.</li>
+</ul>
+<p><strong>Engagement letter rules:</strong> Every client signs before work begins. All letters include a 3–5% annual escalation clause. Shruthi flags renewals 60 days in advance. Any engagement above $5,000/year requires Pratik's review. Scope additions require a signed addendum before the additional work starts.</p>` },
+    ]
+  },
+  life: {
+    label: 'Life Events Article',
+    sections: [
+      { id:'l1', tag:'Section 1', title:'Purpose and guiding principles',
+        body:`<p>This Article governs Partner exits arising from death or long-term disability. It applies to both ownership layers of the firm structure:</p>
+<ul>
+<li><strong>Layer 1:</strong> Each Partner's 33.33% shareholding in PR Tax Associates Inc. (the S-Corp)</li>
+<li><strong>Layer 2:</strong> Each Partner's 100% ownership of their individual LLC (Nital LLC, Pratik LLC, or Hardik LLC), which holds the client portfolio economics and profit-sharing relationship</li>
+</ul>
+<p>Objectives: provide fair and economically grounded compensation; preserve Firm continuity; align exit payments with client relationship value; address the disposition of each Partner's individual LLC in a manner that protects the Firm, remaining Partners, and the exiting Partner's estate.</p>` },
+      { id:'l2', tag:'Section 2', title:'Defined life events',
+        body:`<p>A "Life Event" includes only:</p>
+<ul>
+<li><strong>Long-Term Disability:</strong> Permanent or long-term incapacity materially impairing the Partner's ability to perform customary professional duties, certified by a licensed medical professional for a continuous period of 12 months</li>
+<li><strong>Death:</strong> The death of a Partner</li>
+</ul>
+<p>Each Life Event triggers mandatory exit, valuation, LLC acquisition, insurance coordination, and redemption provisions for both ownership layers.</p>` },
+      { id:'l3', tag:'Section 3', title:'Fair market value (FMV) definition and standards',
+        body:`<p>FMV is determined separately for each ownership layer:</p>
+<ul>
+<li><strong>FMV of S-Corp interest:</strong> Value of the Partner's 33.33% shareholding in PR Tax Associates Inc. on a going-concern basis</li>
+<li><strong>FMV of Partner LLC:</strong> Value of the Partner's 100% LLC ownership based on client portfolio economics and profit-sharing rights. Any open or pending E&O claims against the LLC are included as liabilities and deducted from FMV at valuation.</li>
+</ul>
+<p><strong>FMV standards:</strong> Going-concern basis. Normalized earnings. Firm-level goodwill allocated proportionately. No discounts for minority interest, lack of marketability, death, or disability. Equal ownership percentages do not require equal FMV payouts if client portfolios differ materially in value.</p>` },
+      { id:'l4', tag:'Sections 4–5', title:'Exit framework and Partner LLC disposition',
+        body:`<p><strong>Mandatory exit on a Life Event</strong> applies to both the S-Corp shareholding and the Partner LLC ownership. No estate, heir, or beneficiary retains any voting, management, or governance rights following the effective exit date.</p>
+<p><strong>First right of acquisition (30-day window):</strong> The remaining Partners, acting jointly through PR Tax Associates Inc., have a first right to acquire the exiting Partner's LLC at FMV within 30 days of the final FMV determination. If exercised, the client portfolio transfers to the S-Corp and is reassigned by the Managing Partner. The estate receives FMV installment payments.</p>
+<p><strong>If acquisition right not exercised:</strong> The Partner LLC passes to the estate as an ongoing entity. The estate receives installment payments only. No voting, management, or governance rights transfer to the estate. The estate may not direct, reassign, or solicit the client portfolio.</p>
+<p><strong>E&O coordination:</strong> Any open E&O claims at the valuation date are deducted from Partner LLC FMV. The LLC's E&O policy responds first to any client claims arising during the Partner's tenure before FMV is finalized.</p>` },
+      { id:'l5', tag:'Section 6', title:'Compensation and FMV redemption by life event',
+        body:`<p><strong>Long-term disability — Partner is entitled to:</strong></p>
+<ul>
+<li>Earned but unpaid compensation through the effective exit date</li>
+<li>Accrued and undistributed profit allocations through the effective exit date</li>
+<li>Redemption of S-Corp shareholding at FMV, subject to insurance coordination</li>
+<li>FMV payment for the Partner LLC interest, subject to the 30-day acquisition right and E&O coordination</li>
+</ul>
+<p><strong>Death — estate or designated beneficiary is entitled to:</strong></p>
+<ul>
+<li>Earned but unpaid compensation through the date of death</li>
+<li>Accrued profit distributions through the date of death</li>
+<li>Redemption of S-Corp shareholding at FMV, subject to insurance coordination</li>
+<li>FMV payment for the Partner LLC interest, subject to the 30-day acquisition right and E&O coordination</li>
+</ul>` },
+      { id:'l6', tag:'Sections 7–8', title:'Valuation methodology and payment structure',
+        body:`<p><strong>Valuation framework considers:</strong> Recurring client revenue streams, client retention and concentration risk, client tenure and transition assumptions, firm infrastructure and platform goodwill, and for the Partner LLC specifically: outstanding E&O claims, insurance coverage status, and any insurance deficiencies at the valuation date.</p>
+<p><strong>Valuation procedure:</strong> By unanimous written agreement of remaining Partners within 30 days; or if no agreement, by an independent valuation firm jointly selected. Separate valuations are prepared for the S-Corp shareholding and the Partner LLC interest. Each is treated as an independent economic obligation.</p>
+<p><strong>Payment structure:</strong> Equal annual installments over 5 years, commencing within 90 days of final FMV determination. Client-retention condition applies — installments are adjusted prospectively if clients depart through no fault of the Firm. No repayment of prior installments is required.</p>` },
+      { id:'l7', tag:'Section 9', title:'Insurance coordination and funding',
+        body:`<p><strong>Firm-funded life insurance allowance:</strong> $500 per month per partner, paid from S-Corp operating funds, for individual term life insurance coverage. Each partner selects, owns, and maintains their own policy. The Firm has no ownership interest in any policy.</p>
+<p><strong>Life insurance proceeds apply in this sequence:</strong></p>
+<ul>
+<li>First: toward satisfaction of the S-Corp shareholding FMV redemption obligation</li>
+<li>Second: toward satisfaction of the Partner LLC FMV payment obligation</li>
+<li>Any excess belongs to the Partner or estate</li>
+<li>Any shortfall is paid by the Firm per the installment structure</li>
+</ul>
+<p><strong>E&O coordination on disability:</strong> The Partner LLC's E&O policy responds first to any pending client claims. The Firm withholds the estimated net E&O liability from the Partner LLC FMV payment until claims resolve. This does not affect or delay the S-Corp shareholding FMV payment.</p>` },
+      { id:'l8', tag:'Sections 10–15', title:'No forfeiture, good faith, governing law and relationship to framework',
+        body:`<p><strong>No forfeiture:</strong> No Partner or estate shall forfeit earned compensation, accrued profits, or FMV redemption rights as a result of a Life Event. The E&O claim adjustment is a valuation adjustment, not a forfeiture.</p>
+<p><strong>Good-faith administration:</strong> All actions administered in good faith. Remaining Partners shall not take any action designed to artificially reduce the FMV of the exiting Partner's interests.</p>
+<p><strong>Relationship to Governance Framework:</strong> This Article governs on death and long-term disability. The Governance Framework governs on voluntary withdrawal, performance-based removal, and growth-limiting elections. In case of conflict on Life Event matters, this Article prevails.</p>
+<p><strong>Governing law:</strong> State of Illinois. Disputes resolved in Illinois courts or by binding arbitration if all remaining Partners and the affected estate agree in writing.</p>` },
+    ]
+  }
+};
+
+// ── STORAGE ──────────────────────────────────────────────────────────────────
+async function loadAll() {
+  const all = {};
+  const keys = [...DOCS.gov.sections, ...DOCS.life.sections].map(s => s.id);
+  for (const k of keys) {
+    try { const r = await window.storage.get('fb2:'+k); all[k] = r ? JSON.parse(r.value) : []; }
+    catch(e) { all[k] = []; }
+  }
+  return all;
+}
+
+async function saveFB(secId, partner, status, comment) {
+  let arr = [];
+  try { const r = await window.storage.get('fb2:'+secId); arr = r ? JSON.parse(r.value) : []; } catch(e){}
+  const idx = arr.findIndex(f => f.partner === partner);
+  const entry = { partner, status, comment, time: new Date().toISOString() };
+  if (idx >= 0) arr[idx] = entry; else arr.push(entry);
+  await window.storage.set('fb2:'+secId, JSON.stringify(arr));
+  return arr;
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function doLogin() {
+  const name = document.getElementById('sel-name').value;
+  const code = document.getElementById('inp-code').value;
+  const err = document.getElementById('login-err');
+  if (!name || code !== PASS) { err.classList.add('show'); return; }
+  err.classList.remove('show');
+  currentUser = name;
+  document.getElementById('user-av').textContent = name[0];
+  document.getElementById('user-name-display').textContent = name;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  renderView('gov');
+}
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('inp-code').value = '';
+  document.getElementById('sel-name').value = '';
+}
+
+// ── VIEW SWITCHER ─────────────────────────────────────────────────────────────
+function switchView(v, btn) {
+  currentView = v;
+  document.querySelectorAll('.doc-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderView(v);
+}
+
+async function renderView(v) {
+  const allFb = await loadAll();
+  if (v === 'summary') { renderSummary(allFb); return; }
+  document.getElementById('progress-strip').style.display = 'flex';
+  updateProgress(v, allFb);
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = '';
+  const doc = DOCS[v];
+  doc.sections.forEach(sec => {
+    const fb = allFb[sec.id] || [];
+    mc.appendChild(buildSectionCard(sec, fb));
+  });
+}
+
+function buildSectionCard(sec, fb) {
+  const card = document.createElement('div');
+  card.className = 'section-card';
+  card.id = 'sec-card-' + sec.id;
+  const dots = ['Nital','Pratik','Hardik'].map(p => {
+    const pf = fb.find(f => f.partner === p);
+    return `<div class="r-dot ${pf ? pf.status : ''}" title="${p}: ${pf ? pf.status : 'pending'}"></div>`;
+  }).join('');
+  card.innerHTML = `
+    <div class="section-header" onclick="toggleCard('${sec.id}')">
+      <div style="flex:1">
+        <div class="section-meta"><span class="section-tag">${sec.tag}</span></div>
+        <div class="section-title">${sec.title}</div>
+      </div>
+      <div class="section-right">
+        <div class="response-dots">${dots}</div>
+        <div class="expand-icon" id="icon-${sec.id}">&#9660;</div>
+      </div>
+    </div>
+    <div class="section-body" id="sbody-${sec.id}">
+      <div class="doc-text">
+        <div class="doc-text-label">Document content</div>
+        <div class="doc-text-inner">${sec.body}</div>
+      </div>
+      <div class="feedback-panel">
+        <div class="feedback-panel-title">Partner responses</div>
+        <div class="all-responses" id="allr-${sec.id}"></div>
+        <div class="my-response-box">
+          <div class="my-response-label">Your response — ${currentUser}</div>
+          <div class="status-btns" id="sbts-${sec.id}"></div>
+          <textarea class="comment-area" id="ta-${sec.id}" placeholder="Add a comment, question, or note (optional)..."></textarea>
+          <div class="form-actions">
+            <div class="save-msg" id="smsg-${sec.id}">Saved successfully.</div>
+            <button class="save-btn" id="sbtn-${sec.id}" onclick="submitFB('${sec.id}')">Save response</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  renderResponses(sec.id, fb);
+  renderStatusBtns(sec.id, fb);
+  return card;
+}
+
+function renderResponses(secId, fb) {
+  const el = document.getElementById('allr-' + secId);
+  if (!el) return;
+  el.innerHTML = ['Nital','Pratik','Hardik'].map(p => {
+    const pf = fb.find(f => f.partner === p);
+    if (!pf) return `<div class="response-card pending"><div class="rc-top"><span class="rc-name">${p}</span><span class="rc-status pending">Pending</span></div><div class="rc-comment">No response yet.</div></div>`;
+    return `<div class="response-card ${pf.status}">
+      <div class="rc-top"><span class="rc-name">${p}</span><span class="rc-status ${pf.status}">${pf.status === 'discuss' ? 'Needs discussion' : pf.status.charAt(0).toUpperCase()+pf.status.slice(1)}</span></div>
+      <div class="rc-comment">${pf.comment || '<em style="color:var(--gray-400)">No comment added.</em>'}</div>
+      <div class="rc-time">${new Date(pf.time).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderStatusBtns(secId, fb) {
+  const el = document.getElementById('sbts-' + secId);
+  if (!el) return;
+  const myFb = fb.find(f => f.partner === currentUser);
+  if (myFb) {
+    selectedStatus[secId] = myFb.status;
+    const ta = document.getElementById('ta-' + secId);
+    if (ta) ta.value = myFb.comment || '';
+  }
+  el.innerHTML = [
+    {val:'agreed', label:'Agreed'},
+    {val:'discuss', label:'Needs discussion'},
+    {val:'objection', label:'Objection'}
+  ].map(opt => {
+    const active = selectedStatus[secId] === opt.val ? `active-${opt.val}` : '';
+    return `<button class="s-btn ${active}" id="sbt-${opt.val}-${secId}" onclick="pickStatus('${secId}','${opt.val}')">${opt.label}</button>`;
+  }).join('');
+}
+
+function pickStatus(secId, status) {
+  selectedStatus[secId] = status;
+  ['agreed','discuss','objection'].forEach(s => {
+    const b = document.getElementById('sbt-' + s + '-' + secId);
+    if (b) { b.className = 's-btn' + (s === status ? ' active-' + s : ''); }
+  });
+}
+
+function toggleCard(secId) {
+  const body = document.getElementById('sbody-' + secId);
+  const icon = document.getElementById('icon-' + secId);
+  if (!body) return;
+  body.classList.toggle('open');
+  if (icon) icon.classList.toggle('open');
+}
+
+async function submitFB(secId) {
+  const status = selectedStatus[secId];
+  if (!status) { alert('Please select Agreed, Needs discussion, or Objection before saving.'); return; }
+  const comment = (document.getElementById('ta-' + secId) || {}).value || '';
+  const btn = document.getElementById('sbtn-' + secId);
+  const msg = document.getElementById('smsg-' + secId);
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const updated = await saveFB(secId, currentUser, status, comment);
+  btn.disabled = false; btn.textContent = 'Save response';
+  if (msg) { msg.classList.add('show'); setTimeout(() => msg.classList.remove('show'), 2500); }
+  renderResponses(secId, updated);
+  renderStatusBtns(secId, updated);
+  updateDots(secId, updated);
+  const allFb = await loadAll();
+  updateProgress(currentView, allFb);
+}
+
+function updateDots(secId, fb) {
+  const header = document.querySelector('#sec-card-' + secId + ' .response-dots');
+  if (!header) return;
+  header.innerHTML = ['Nital','Pratik','Hardik'].map(p => {
+    const pf = fb.find(f => f.partner === p);
+    return `<div class="r-dot ${pf ? pf.status : ''}" title="${p}: ${pf ? pf.status : 'pending'}"></div>`;
+  }).join('');
+}
+
+function updateProgress(docId, allFb) {
+  const secs = DOCS[docId] ? DOCS[docId].sections : [];
+  const partners = ['Nital','Pratik','Hardik'];
+  const total = secs.length * 3;
+  const done = secs.reduce((sum, s) => sum + (allFb[s.id]||[]).length, 0);
+  const pct = total > 0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-info').textContent = `${pct}% reviewed (${done} of ${total} responses)`;
+  document.getElementById('partner-stat').innerHTML = partners.map(p => {
+    const resp = secs.filter(s => (allFb[s.id]||[]).some(f => f.partner === p)).length;
+    const full = secs.every(s => (allFb[s.id]||[]).some(f => f.partner === p && f.status === 'agreed'));
+    const cls = full ? 'complete' : resp > 0 ? 'partial' : 'none';
+    return `<span class="p-badge ${cls}">${p}: ${resp}/${secs.length}</span>`;
+  }).join('');
+}
+
+async function renderSummary(allFb) {
+  document.getElementById('progress-strip').style.display = 'none';
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = '';
+  const allSecs = [
+    ...DOCS.gov.sections.map(s => ({...s, docLabel:'Governance Framework'})),
+    ...DOCS.life.sections.map(s => ({...s, docLabel:'Life Events Article'}))
+  ];
+  const partners = ['Nital','Pratik','Hardik'];
+  let nAgreed=0, nDiscuss=0, nObj=0, nPending=0;
+  allSecs.forEach(s => {
+    const fb = allFb[s.id]||[];
+    partners.forEach(p => {
+      const pf = fb.find(f => f.partner === p);
+      if (!pf) nPending++;
+      else if (pf.status === 'agreed') nAgreed++;
+      else if (pf.status === 'discuss') nDiscuss++;
+      else nObj++;
+    });
+  });
+  const total = allSecs.length * 3;
+  mc.innerHTML = `
+    <div class="summary-metrics">
+      <div class="sm-card"><div class="sm-label">Total responses</div><div class="sm-value">${nAgreed+nDiscuss+nObj}</div><div class="sm-sub">of ${total} required</div></div>
+      <div class="sm-card"><div class="sm-label">Agreed</div><div class="sm-value green">${nAgreed}</div></div>
+      <div class="sm-card"><div class="sm-label">Needs discussion</div><div class="sm-value amber">${nDiscuss}</div></div>
+      <div class="sm-card"><div class="sm-label">Objections</div><div class="sm-value red">${nObj}</div></div>
+      <div class="sm-card"><div class="sm-label">Pending responses</div><div class="sm-value" style="color:var(--gray-400)">${nPending}</div></div>
+    </div>`;
+
+  function group(label, cls, filter, emptyText) {
+    const items = allSecs.filter(filter);
+    const div = document.createElement('div');
+    div.className = 'summary-group';
+    div.innerHTML = `<div class="sg-heading ${cls}">${label} <span class="sg-count">${items.length}</span></div>`;
+    if (items.length === 0) { div.innerHTML += `<div class="empty-state">${emptyText}</div>`; }
+    else items.forEach(s => {
+      const fb = allFb[s.id]||[];
+      const pdots = partners.map(p => {
+        const pf = fb.find(f => f.partner === p);
+        const st = pf ? pf.status : 'pending';
+        return `<span class="sr-pill ${st}">${p}: ${st === 'discuss' ? 'Discuss' : st.charAt(0).toUpperCase()+st.slice(1)}</span>`;
+      }).join('');
+      const comments = partners.filter(p => { const pf = fb.find(f=>f.partner===p); return pf && pf.comment; })
+        .map(p => { const pf = fb.find(f=>f.partner===p); return `<div class="sr-comment-line"><strong>${p}:</strong> ${pf.comment}</div>`; }).join('');
+      div.innerHTML += `<div class="summary-row">
+        <div class="sr-doc">${s.docLabel}</div>
+        <div class="sr-title">${s.tag}: ${s.title}</div>
+        <div class="sr-responses">${pdots}</div>
+        ${comments ? `<div class="sr-comments">${comments}</div>` : ''}
+      </div>`;
+    });
+    mc.appendChild(div);
+  }
+
+  group('Sections with objections', 'objection',
+    s => { const fb = allFb[s.id]||[]; return fb.some(f=>f.status==='objection'); },
+    'No objections raised yet.');
+  group('Sections needing discussion', 'discuss',
+    s => { const fb = allFb[s.id]||[]; return !fb.some(f=>f.status==='objection') && fb.some(f=>f.status==='discuss'); },
+    'No sections flagged for discussion.');
+  group('Sections fully agreed by all partners', 'agreed',
+    s => { const fb = allFb[s.id]||[]; return partners.every(p=>fb.some(f=>f.partner===p&&f.status==='agreed')); },
+    'No sections fully agreed yet.');
+  group('Sections pending responses', 'pending',
+    s => { const fb = allFb[s.id]||[]; return !partners.every(p=>fb.some(f=>f.partner===p)); },
+    'All sections have full responses.');
+}
+</script>
+</body>
+</html>
